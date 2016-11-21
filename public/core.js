@@ -6,6 +6,22 @@ function mainController($scope, $http) {
 	$scope.formData = {};
 	$scope.todos = {};
 
+    //Teste style baterias. Deve vir das chamadas SNMP
+    $scope.battery0 = {};
+    $scope.battery0.percentage = 95;
+    $scope.battery0.color = "#0F0";
+
+    $scope.battery1 = {};
+    $scope.battery1.percentage = 45;
+    $scope.battery1.color = "#F90";
+
+    $scope.battery2 = {};
+    $scope.battery2.percentage = 25;
+    $scope.battery2.color = "#F20";
+
+    $scope.batteries = [$scope.battery0, $scope.battery1, $scope.battery2];
+    ////////////////////////////////////////////////////////
+
     function uintToString(uintArray) {
         var encodedString = String.fromCharCode.apply(null, uintArray),
             decodedString = decodeURIComponent(escape(encodedString));

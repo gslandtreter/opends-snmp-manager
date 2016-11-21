@@ -1,0 +1,44 @@
+
+.battery {
+    position: relative;
+    height: 120px;
+    border: 10px solid #000;
+    border-radius: 20px;
+    position: relative;
+    padding: 10px;
+    -webkit-transform: scale(0.5);
+
+}
+
+.battery:before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 50%;
+    right: -33px;
+    margin-top: -30px;
+    width: 60px;
+    height: 60px;
+    background: #000;
+    clip: rect(0, 60px, 60px, 39px);
+    border-radius: 50%;
+}
+
+.battery.plugged:after {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 50%;
+    right: -190px;
+    margin-top: -30px;
+    width: 60px;
+    height: 60px;
+    background: #f00;
+    border-radius: 50%;
+}
+
+.battery .level {
+    height: 100%;
+    border-radius: 10px;
+    font-size: 100px;
+}
