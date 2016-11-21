@@ -22,6 +22,22 @@ function mainController($scope, $http) {
     $scope.batteries = [$scope.battery0, $scope.battery1, $scope.battery2];
     ////////////////////////////////////////////////////////
 
+    //Seta item do menu como ativo
+    $scope.menuLoaded = function() {
+        $('#menuIndex').addClass('active');
+    }
+
+    //Obtem configs do agente
+    $scope.agentConfig = JSON.parse(localStorage.getItem("agentConfig"));
+
+    if($scope.agentConfig == null) {
+        //Default
+        $scope.agentConfig = {
+            address: "127.0.0.1",
+            port: 2001
+        }
+    }
+
     function uintToString(uintArray) {
         var encodedString = String.fromCharCode.apply(null, uintArray),
             decodedString = decodeURIComponent(escape(encodedString));
@@ -33,8 +49,8 @@ function mainController($scope, $http) {
             method: 'GET',
             url: '/api/snmp',
             params: {
-                agentIP: "127.0.0.1",
-                agentPort: 2001,
+                agentIP: $scope.agentConfig.address,
+                agentPort: $scope.agentConfig.port,
                 oids: "1.3.6.1.4.1.12619.5.4.0,1.3.6.1.4.1.12619.5.8.2.0,1.3.6.1.4.1.12619.5.6.0"
             }
         }).then(function successCallback(response) {
