@@ -80,8 +80,16 @@
                         </div>
                         <div class="panel-body">
                             <p>
-                                Total Percorrido: {{totalPercorrido}} km<br>
-                                Baterias: NUMSEI
+                                Veículo: <b>{{brandAndModel}}</b><br>
+                                ID: <b>{{vehicleID}}</b><br>
+                                <br>
+                                Total Percorrido: <b>{{totalPercorrido}} km</b><br>
+                                <br>
+                                Motor: <b>{{motorDescription}}</b><br>
+                                Potencia Máxima do Motor: <b>{{motorMaxPower}} kW</b><br>
+                                <br>
+                                Quantidade Módulos Bateria: <b>{{batteryModuleCount}}</b><br>
+                                Capacidade da Bateria: <b>{{batteryCapacity}} kWh</b><br>
                             </p>
                         </div>
                     </div>
@@ -98,7 +106,7 @@
                                 <i class="fa fa-chevron-down"></i>
                                 <i class="fa fa-times"></i>
                             </div>
-                        </div>
+                        </di
                         <div class="panel-body">
                             <div id="graficoRPM"></div>
                         </div>
@@ -115,7 +123,13 @@
                             </div>
                         </div>
                         <div class="panel-body">
-                            <div ng-repeat="battery in batteries" class="battery" ><div class="level" style="width:{{battery.percentage}}%;background:{{battery.color}}"></div></div>
+                            <p>
+                                Voltagem: <b>{{batteryVoltage}} V</b><br>
+                                Corrente: <b>{{batteryAmps}} A</b><br>
+                                CurrentChargeState: <b>{{currentChargeState}} kWh</b><br>
+                                Porcentagem: <b>{{batteryPercentage}}%</b><br>
+                            </p>
+                            <div class="battery" ><div class="level" style="width:{{batteryPercentage}}%;background:#0F0"></div></div>
                         </div>
                     </div>
                 </div>

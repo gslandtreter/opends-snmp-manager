@@ -44,6 +44,44 @@ function mainController($scope, $http) {
         return decodedString;
     }
 
+    function requestInitialInformation() {
+        $http({
+            method: 'GET',
+            url: '/api/snmp',
+            params: {
+                agentIP: $scope.agentConfig.address,
+                agentPort: $scope.agentConfig.port,
+                oids: "1.3.6.1.4.1.12619.5.1.0," + //Brand and Model
+                "1.3.6.1.4.1.12619.5.2.0," + //VIN
+                "1.3.6.1.4.1.12619.5.3.0," + // MaxPower
+                "1.3.6.1.4.1.12619.5.8.1.0," + // Motor Description
+                "1.3.6.1.4.1.12619.5.8.3.0," + //Motor MAX Power
+                "1.3.6.1.4.1.12619.5.9.1.0," + //Battery Capacity
+                "1.3.6.1.4.1.12619.5.9.3.0" //Battery Module Count
+            }
+        }).then(function successCallback(response) {
+
+            var responseData = response.data;
+
+            //console.log(responseData)
+
+            $scope.brandAndModel = uintToString(responseData[0].value.data);
+            $scope.vehicleID = uintToString(responseData[1].value.data);
+            $scope.maxPower = uintToString(responseData[2].value.data);
+            $scope.motorDescription = uintToString(responseData[3].value.data);
+            $scope.motorMaxPower = responseData[4].value;
+            $scope.batteryCapacity = uintToString(responseData[5].value.data);
+            $scope.batteryModuleCount = responseData[6].value;
+
+
+            //$scope.totalPercorrido = parseFloat(uintToString(responseData[2].value.data)).toFixed(2);
+
+        }, function errorCallback(response) {
+
+        });
+    }
+
+
     function requestData() {
         $http({
             method: 'GET',
@@ -51,7 +89,12 @@ function mainController($scope, $http) {
             params: {
                 agentIP: $scope.agentConfig.address,
                 agentPort: $scope.agentConfig.port,
-                oids: "1.3.6.1.4.1.12619.5.4.0,1.3.6.1.4.1.12619.5.8.2.0,1.3.6.1.4.1.12619.5.6.0"
+                oids: "1.3.6.1.4.1.12619.5.4.0," + //Velocidade
+                "1.3.6.1.4.1.12619.5.8.2.0," + //RPM
+                "1.3.6.1.4.1.12619.5.6.0," + //Distancia Percorrida
+                "1.3.6.1.4.1.12619.5.9.4.0," + //Voltagem Bateria
+                "1.3.6.1.4.1.12619.5.9.5.0," + //Corrente Bateria
+                "1.3.6.1.4.1.12619.5.9.2.0" //BatteryChargeState
             }
         }).then(function successCallback(response) {
             var seriesSpeed = $scope.chartSpeed.series[0],
@@ -69,6 +112,11 @@ function mainController($scope, $http) {
             seriesRPM.addPoint([Date.now(), rpm], true, shift);
 
             $scope.totalPercorrido = parseFloat(uintToString(responseData[2].value.data)).toFixed(2);
+            $scope.batteryVoltage = responseData[3].value;
+            $scope.batteryAmps = responseData[4].value;
+            $scope.currentChargeState = responseData[5].value;
+
+            $scope.batteryPercentage = ($scope.currentChargeState * 100.0) / $scope.batteryCapacity;
 
         }, function errorCallback(response) {
 
@@ -135,5 +183,6 @@ function mainController($scope, $http) {
         }]
     });
 
+    requestInitialInformation();
     setInterval(requestData, 1000);
 }
