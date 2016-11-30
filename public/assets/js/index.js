@@ -68,7 +68,7 @@ function mainController($scope, $http) {
             var rpm = responseData[1].value;
             seriesRPM.addPoint([Date.now(), rpm], true, shift);
 
-            $scope.totalPercorrido = uintToString(responseData[2].value.data);
+            $scope.totalPercorrido = parseFloat(uintToString(responseData[2].value.data)).toFixed(2);
 
         }, function errorCallback(response) {
 
