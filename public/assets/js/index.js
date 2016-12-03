@@ -6,20 +6,25 @@ function mainController($scope, $http) {
 	$scope.formData = {};
 	$scope.todos = {};
 
-    //Teste style baterias. Deve vir das chamadas SNMP
-    $scope.battery0 = {};
-    $scope.battery0.percentage = 95;
-    $scope.battery0.color = "#0F0";
+    $scope.batteryPercentage = 100;
 
-    $scope.battery1 = {};
-    $scope.battery1.percentage = 45;
-    $scope.battery1.color = "#F90";
+    $scope.getBatteryColor = function(percentage) {
 
-    $scope.battery2 = {};
-    $scope.battery2.percentage = 25;
-    $scope.battery2.color = "#F20";
+        if(percentage > 60) {
+            return "#0F0"
+        }
+        else if (percentage > 20) {
+            return "#F90"
+        }
+        else {
+            return "#F20"
+        }
+    }
 
-    $scope.batteries = [$scope.battery0, $scope.battery1, $scope.battery2];
+    $scope.prettyFloat = function(float, decimalPlaces) {
+        return parseFloat(float).toFixed(decimalPlaces)
+    }
+
     ////////////////////////////////////////////////////////
 
     //Seta item do menu como ativo
@@ -34,11 +39,11 @@ function mainController($scope, $http) {
         //Default
         $scope.agentConfig = {
             address: "127.0.0.1",
-            port: 2001
+            port: 161
         }
     }
 
-    function uintToString(uintArray) {
+    $scope.uintToString = function(uintArray) {
         var encodedString = String.fromCharCode.apply(null, uintArray),
             decodedString = decodeURIComponent(escape(encodedString));
         return decodedString;
@@ -47,7 +52,7 @@ function mainController($scope, $http) {
     function requestInitialInformation() {
         $http({
             method: 'GET',
-            url: '/api/snmp',
+            url: '/api/snmp/get',
             params: {
                 agentIP: $scope.agentConfig.address,
                 agentPort: $scope.agentConfig.port,
@@ -65,16 +70,15 @@ function mainController($scope, $http) {
 
             //console.log(responseData)
 
-            $scope.brandAndModel = uintToString(responseData[0].value.data);
-            $scope.vehicleID = uintToString(responseData[1].value.data);
-            $scope.maxPower = uintToString(responseData[2].value.data);
-            $scope.motorDescription = uintToString(responseData[3].value.data);
+            $scope.brandAndModel = $scope.uintToString(responseData[0].value.data);
+            $scope.vehicleID = $scope.uintToString(responseData[1].value.data);
+            $scope.maxPower = $scope.uintToString(responseData[2].value.data);
+            $scope.motorDescription = $scope.uintToString(responseData[3].value.data);
             $scope.motorMaxPower = responseData[4].value;
-            $scope.batteryCapacity = uintToString(responseData[5].value.data);
+            $scope.batteryCapacity = $scope.uintToString(responseData[5].value.data);
             $scope.batteryModuleCount = responseData[6].value;
 
-
-            //$scope.totalPercorrido = parseFloat(uintToString(responseData[2].value.data)).toFixed(2);
+            makeGraphs();
 
         }, function errorCallback(response) {
 
@@ -85,7 +89,7 @@ function mainController($scope, $http) {
     function requestData() {
         $http({
             method: 'GET',
-            url: '/api/snmp',
+            url: '/api/snmp/get',
             params: {
                 agentIP: $scope.agentConfig.address,
                 agentPort: $scope.agentConfig.port,
@@ -111,7 +115,7 @@ function mainController($scope, $http) {
             var rpm = responseData[1].value;
             seriesRPM.addPoint([Date.now(), rpm], true, shift);
 
-            $scope.totalPercorrido = parseFloat(uintToString(responseData[2].value.data)).toFixed(2);
+            $scope.totalPercorrido = parseFloat($scope.uintToString(responseData[2].value.data)).toFixed(2);
             $scope.batteryVoltage = responseData[3].value;
             $scope.batteryAmps = responseData[4].value;
             $scope.currentChargeState = responseData[5].value;
@@ -123,66 +127,94 @@ function mainController($scope, $http) {
         });
     }
 
-    $scope.chartSpeed = new Highcharts.Chart({
-        chart: {
-            renderTo: 'graficoSpeed',
-            defaultSeriesType: 'spline',
-            events: {
-                load: requestData
+    function getBatteryTable() {
+        $http({
+            method: 'GET',
+            url: '/api/snmp/getTable',
+            params: {
+                agentIP: $scope.agentConfig.address,
+                agentPort: $scope.agentConfig.port,
+                oid: "1.3.6.1.4.1.12619.5.9.6", //Tabela Bateria
+                tableLines: 16,
+                tableColumns: 7
             }
-        },
-        title: {
-            text: 'Velocidade (KM/h)'
-        },
-        xAxis: {
-            type: 'datetime',
-            tickPixelInterval: 150,
-            maxZoom: 20 * 1000
-        },
-        yAxis: {
-            minPadding: 0.2,
-            maxPadding: 0.2,
-            title: {
-                text: '(KM/h)',
-                margin: 80
-            }
-        },
-        series: [{
-            name: 'Carro1',
-            data: []
-        }]
-    });
+        }).then(function successCallback(response) {
 
-    $scope.chartRPM = new Highcharts.Chart({
-        chart: {
-            renderTo: 'graficoRPM',
-            defaultSeriesType: 'spline',
-            events: {
-                load: requestData
-            }
-        },
-        title: {
-            text: 'Revoluções por Minuto (RPM)'
-        },
-        xAxis: {
-            type: 'datetime',
-            tickPixelInterval: 150,
-            maxZoom: 20 * 1000
-        },
-        yAxis: {
-            minPadding: 0.2,
-            maxPadding: 0.2,
+            var table = response.data;
+
+            $scope.tabelaBateria = table;
+
+        }, function errorCallback(response) {
+
+        });
+    }
+
+    function makeGraphs() {
+        $scope.chartSpeed = new Highcharts.Chart({
+            chart: {
+                renderTo: 'graficoSpeed',
+                defaultSeriesType: 'spline',
+                events: {
+                    load: requestData
+                }
+            },
             title: {
-                text: 'RPM',
-                margin: 80
-            }
-        },
-        series: [{
-            name: 'Carro1',
-            data: []
-        }]
-    });
+                text: 'Velocidade (KM/h)'
+            },
+            xAxis: {
+                type: 'datetime',
+                tickPixelInterval: 150,
+                maxZoom: 20 * 1000
+            },
+            yAxis: {
+                minPadding: 0.2,
+                maxPadding: 0.2,
+                min: 0,
+                title: {
+                    text: '(KM/h)',
+                    margin: 80
+                }
+            },
+            series: [{
+                name: $scope.brandAndModel,
+                data: []
+            }]
+        });
+
+        $scope.chartRPM = new Highcharts.Chart({
+            chart: {
+                renderTo: 'graficoRPM',
+                defaultSeriesType: 'spline',
+                events: {
+                    load: requestData
+                }
+            },
+            title: {
+                text: 'Revoluções por Minuto (RPM)'
+            },
+            xAxis: {
+                type: 'datetime',
+                tickPixelInterval: 150,
+                maxZoom: 20 * 1000
+            },
+            yAxis: {
+                minPadding: 0.2,
+                maxPadding: 0.2,
+                min: 0,
+                title: {
+                    text: 'RPM',
+                    margin: 80
+                }
+            },
+            series: [{
+                name: $scope.brandAndModel,
+                data: []
+            }]
+        });
+    }
 
     requestInitialInformation();
+    getBatteryTable();
     setInterval(requestData, 1000);
+    setInterval(getBatteryTable, 3000);
 }

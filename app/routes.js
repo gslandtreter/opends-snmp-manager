@@ -6,7 +6,7 @@ module.exports = function(app) {
 
 	// api ---------------------------------------------------------------------
 	// get all todos
-	app.get('/api/snmp', function(req, res) {
+	app.get('/api/snmp/get', function(req, res) {
 
 		var agentIP = req.query.agentIP;
 		var agentPort = req.query.agentPort;
@@ -17,6 +17,21 @@ module.exports = function(app) {
 			res.json(result); // return all todos in JSON format
 		});
 	});
+
+    app.get('/api/snmp/getTable', function(req, res) {
+
+        var agentIP = req.query.agentIP;
+        var agentPort = req.query.agentPort;
+        var oid = req.query.oid;
+        var lines = req.query.tableLines;
+        var columns = req.query.tableColumns;
+
+        // use mongoose to get all todos in the database
+        Snmp.getTable(agentIP, agentPort, oid, lines, columns, function(table) {
+
+            res.json(table); // return all todos in JSON format
+        });
+    });
 
 
 

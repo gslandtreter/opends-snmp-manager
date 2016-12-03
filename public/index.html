@@ -126,10 +126,50 @@
                             <p>
                                 Voltagem: <b>{{batteryVoltage}} V</b><br>
                                 Corrente: <b>{{batteryAmps}} A</b><br>
-                                CurrentChargeState: <b>{{currentChargeState}} kWh</b><br>
-                                Porcentagem: <b>{{batteryPercentage}}%</b><br>
+                                Capacidade Atual: <b>{{currentChargeState}} kWh</b><br>
+                                Carga da Bateria: <b>{{prettyFloat(batteryPercentage, 3)}}%</b><br>
                             </p>
-                            <div class="battery" ><div class="level" style="width:{{batteryPercentage}}%;background:#0F0"></div></div>
+                            <div class="battery" ><div class="level" style="width:{{batteryPercentage}}%;background:{{getBatteryColor(batteryPercentage)}}"></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                <div class="row">
+                <div class="col-md-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Módulos da Bateria</h3>
+                            <div class="actions pull-right">
+                                <i class="fa fa-chevron-down"></i>
+                                <i class="fa fa-times"></i>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <table class="table table-bordered">
+                                <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Capacidade Máx.</th>
+                                    <th>Corrente Máx.</th>
+                                    <th>Temperatura</th>
+                                    <th>Voltagem</th>
+                                    <th>Capacidade Atual</th>
+                                    <th>Data de Fabricação</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="x in tabelaBateria">
+                                        <td>{{x[0]}}</td>
+                                        <td>{{x[1]}} Wh</td>
+                                        <td>{{x[2]}} A</td>
+                                        <td>{{x[3]}} ºC</td>
+                                        <td>{{x[4]}} mV</td>
+                                        <td>{{x[5]}} wH</td>
+                                        <td>{{uintToString(x[6].data)}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
                         </div>
                     </div>
                 </div>
