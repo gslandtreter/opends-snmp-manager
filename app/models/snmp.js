@@ -1,10 +1,10 @@
 
+//Carrega modulo net-snmp
 var snmp = require ("net-snmp");
-
-//var oids = ["1.3.6.1.2.1.1.99.0"];
 
 module.exports = {
 
+    //SNMP-GET
 	get: function(agentIP, agentPort, oids, callBack) {
 
         var options = {
@@ -16,17 +16,20 @@ module.exports = {
             version: snmp.Version2c
         };
 
+        //Conecta ao agente
         var session = snmp.createSession (agentIP, "public", options);
 
+        //Roda funcao SNMP GET
         session.get (oids, function (error, varbinds) {
             if (!error) {
                 var retValue = [];
                 for (var i = 0; i < varbinds.length; i++) {
                     if (!snmp.isVarbindError(varbinds[i])) {
+                        //Obtem resultados
                         retValue.push(varbinds[i]);
-
                     }
                 }
+                //Callback retorno
                 callBack(retValue);
             } else {
                 console.error(error);
@@ -47,6 +50,7 @@ module.exports = {
             return arr;
         }
 
+        //Armazena espaço para a tabela
         table = Create2DArray(lines);
         var tableRows = 0;
 
@@ -59,8 +63,10 @@ module.exports = {
             version: snmp.Version2c
         };
 
+        //Conecta no agente
         var session = snmp.createSession (agentIP, "public", options);
 
+        //Callback termino do loop
         function doneCb (error) {
             if (error)
                 callBack(error);
@@ -68,6 +74,7 @@ module.exports = {
             callBack(table);
         }
 
+        //Popula tabela com retorno
         function feedCb (varbinds) {
 
             for (var i = 0; i < varbinds.length; i++) {
@@ -80,6 +87,7 @@ module.exports = {
             tableRows++
         }
 
+        //Chama SNMP Walk
         session.walk (oid, 16, feedCb, doneCb);
     }
 };

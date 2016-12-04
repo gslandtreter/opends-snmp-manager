@@ -1,4 +1,4 @@
-var scotchTodo = angular.module('scotchTodo', []);
+var scotchTodo = angular.module('gerenteSNMP', []);
 
 
 
@@ -12,6 +12,7 @@ function mainController($scope, $http) {
         $('#menuConfig').addClass('active');
     };
 
+    //Função que salva os valores de configuracao no localStorage
     $scope.vaiFilhao = function() {
         //Salva valores na localStorage
         var agentConfig = {

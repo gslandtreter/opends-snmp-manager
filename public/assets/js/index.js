@@ -1,4 +1,4 @@
-var scotchTodo = angular.module('scotchTodo', []);
+var scotchTodo = angular.module('gerenteSNMP', []);
 
 
 
@@ -8,6 +8,7 @@ function mainController($scope, $http) {
 
     $scope.batteryPercentage = 100;
 
+    //Funcao q retorna a cor da bateria de acordo com a porcentagem
     $scope.getBatteryColor = function(percentage) {
 
         if(percentage > 60) {
@@ -21,6 +22,7 @@ function mainController($scope, $http) {
         }
     }
 
+    //Funcao para printar de forma bonita um float
     $scope.prettyFloat = function(float, decimalPlaces) {
         return parseFloat(float).toFixed(decimalPlaces)
     }
@@ -35,6 +37,7 @@ function mainController($scope, $http) {
     //Obtem configs do agente
     $scope.agentConfig = JSON.parse(localStorage.getItem("agentConfig"));
 
+    //Configurações Default
     if($scope.agentConfig == null) {
         //Default
         $scope.agentConfig = {
@@ -43,12 +46,14 @@ function mainController($scope, $http) {
         }
     }
 
+    //Função para converter char array para string
     $scope.uintToString = function(uintArray) {
         var encodedString = String.fromCharCode.apply(null, uintArray),
             decodedString = decodeURIComponent(escape(encodedString));
         return decodedString;
     }
 
+    //Obtem informacoes iniciais do agente
     function requestInitialInformation() {
         $http({
             method: 'GET',
@@ -70,6 +75,7 @@ function mainController($scope, $http) {
 
             //console.log(responseData)
 
+            //Popula variáveis da tela com o resultado
             $scope.brandAndModel = $scope.uintToString(responseData[0].value.data);
             $scope.vehicleID = $scope.uintToString(responseData[1].value.data);
             $scope.maxPower = $scope.uintToString(responseData[2].value.data);
@@ -78,6 +84,7 @@ function mainController($scope, $http) {
             $scope.batteryCapacity = $scope.uintToString(responseData[5].value.data);
             $scope.batteryModuleCount = responseData[6].value;
 
+            //Cria os gráficos
             makeGraphs();
 
         }, function errorCallback(response) {
@@ -86,6 +93,7 @@ function mainController($scope, $http) {
     }
 
 
+    //Obtem dados do agente SNMP
     function requestData() {
         $http({
             method: 'GET',
@@ -101,6 +109,7 @@ function mainController($scope, $http) {
                 "1.3.6.1.4.1.12619.5.9.2.0" //BatteryChargeState
             }
         }).then(function successCallback(response) {
+            //Popula gráfico da velocidade
             var seriesSpeed = $scope.chartSpeed.series[0],
                 shift = seriesSpeed.data.length > 20;
 
@@ -109,12 +118,14 @@ function mainController($scope, $http) {
             var speed = responseData[0].value;
             seriesSpeed.addPoint([Date.now(), speed], true, shift);
 
+            //Popula gráfico da RDM
             var seriesRPM = $scope.chartRPM.series[0];
                 shift = seriesRPM.data.length > 20;
 
             var rpm = responseData[1].value;
             seriesRPM.addPoint([Date.now(), rpm], true, shift);
 
+            //Atualiza variáveis da tela com as informações do agente snmp
             $scope.totalPercorrido = parseFloat($scope.uintToString(responseData[2].value.data)).toFixed(2);
             $scope.batteryVoltage = responseData[3].value;
             $scope.batteryAmps = responseData[4].value;
@@ -127,6 +138,7 @@ function mainController($scope, $http) {
         });
     }
 
+    //Obtem tabela com as informações dos módulos da bateria
     function getBatteryTable() {
         $http({
             method: 'GET',
@@ -140,8 +152,8 @@ function mainController($scope, $http) {
             }
         }).then(function successCallback(response) {
 
+            //Popula variávela da tabela com o resultado
             var table = response.data;
-
             $scope.tabelaBateria = table;
 
         }, function errorCallback(response) {
@@ -149,6 +161,7 @@ function mainController($scope, $http) {
         });
     }
 
+    //Cria os gráficos do highcharts
     function makeGraphs() {
         $scope.chartSpeed = new Highcharts.Chart({
             chart: {
@@ -213,6 +226,7 @@ function mainController($scope, $http) {
         });
     }
 
+    //Inicializa valores da tela e configura loop que obtem os dados do agente snmp
     requestInitialInformation();
     getBatteryTable();
     setInterval(requestData, 1000);
