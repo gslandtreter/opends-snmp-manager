@@ -57,14 +57,14 @@
                 <div class="col-md-8">
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            <h3 class="panel-title">Velocidade</h3>
+                            <h3 class="panel-title">Capacidade Bateria</h3>
                             <div class="actions pull-right">
                                 <i class="fa fa-chevron-down"></i>
                                 <i class="fa fa-times"></i>
                             </div>
                         </div>
                         <div class="panel-body">
-                            <div id="graficoSpeed"></div>
+                            <div id="graficoCapacidadeBateria"></div>
                         </div>
                     </div>
                 </div>
@@ -101,14 +101,14 @@
                 <div class="col-md-8">
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            <h3 class="panel-title">Revoluções por Minuto</h3>
+                            <h3 class="panel-title">Corrente da Bateria</h3>
                             <div class="actions pull-right">
                                 <i class="fa fa-chevron-down"></i>
                                 <i class="fa fa-times"></i>
                             </div>
                         </di
                         <div class="panel-body">
-                            <div id="graficoRPM"></div>
+                            <div id="graficoCorrente"></div>
                         </div>
                     </div>
                 </div>
@@ -164,7 +164,7 @@
                                         <td>{{x[2]}} A</td>
                                         <td>{{x[3]}} ºC</td>
                                         <td>{{x[4]}} mV</td>
-                                        <td>{{x[5]}} Wh</td>
+                                        <td>{{x[5]}} wH</td>
                                         <td>{{uintToString(x[6].data)}}</td>
                                     </tr>
                                 </tbody>
@@ -192,6 +192,6 @@
 
 <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.16/angular.min.js"></script><!-- load angular -->
 <script src="/bower_components/highcharts/highcharts.js"></script>
-<script src="assets/js/index.js"></script>
+<script src="assets/js/baterias.js"></script>
 </body>
 </html>
